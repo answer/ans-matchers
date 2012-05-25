@@ -1,5 +1,6 @@
 #!/usr/bin/env rake
 
+require "ans-releaser"
 class ReleaseTask
   include Ans::Releaser::GemTask
 
