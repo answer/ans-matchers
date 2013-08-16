@@ -3,46 +3,35 @@ ans-matchers
 
 rspec のマッチャ拡張
 
+* `have_out_of_range_validation`
 * `success_persistance_of`
 * `have_executable_scope`
 
 
-success_persistance_of(:attribute)
+have_out_of_range_validation(columns)
 ----------------------------------
 
-「保存に成功すること」
+「sql レベルで out of range を起こす値をバリデーションエラーにすること」
 
     describe Model do
-      it{should_not success_persistance_of(:name).values(["a"*256])}
+      it{should have_out_of_range_validation}
     end
 
-データベースに保存できないデータを指定して、 `should_not` でマッチさせることを想定している
+全カラムはモデルの columns メソッドを使用して取得する  
+保存できる最大長は column オブジェクトから取得する
 
-`values` メソッドで、値を配列で指定する
+自動で取得した最大長を上書きしたい場合は columns を指定する
 
 例)
 
     describe Model do
-      it{should_not success_persistance_of(:name).values([nil])}      # not null カラム
-      it{should_not success_persistance_of(:name).values(["a", "a"])} # unique カラム
-      it{should_not success_persistance_of(:name).values(["a"*256])}  # varchar(255)
-      it{should_not success_persistance_of(:name).values([10**10])}   # int(9)
+      it{should have_out_of_range_validation(name: "a"*256)}
     end
 
-他のカラムはすべて nil で保存される
+success_persistance_of の全カラム版
 
-他のカラムにデフォルトを与える場合は subject 句を定義する
+primary カラムは除外されるが、その他のカラムを除外することはできない
 
-例)
-
-    describe Model do
-      subject{Model.new FactoryGirl.attributes_for(:model)}
-
-      it{should_not success_persistance_of(:name).values([nil])}      # not null カラム
-      it{should_not success_persistance_of(:name).values(["a", "a"])} # unique カラム
-      it{should_not success_persistance_of(:name).values(["a"*256])}  # varchar(255)
-      it{should_not success_persistance_of(:name).values([10**10])}   # int(9)
-    end
 
 have_executable_scope(:scope).params("arg1","arg2").to_sql(sql)
 ---------------------------------------------------------------
@@ -96,5 +85,43 @@ sql は空白をまとめて比較される
         `table`.`column` = 'c'
     SQL
 
+    end
+
+
+success_persistance_of(:attribute)
+----------------------------------
+
+「保存に成功すること」
+
+    describe Model do
+      it{should_not success_persistance_of(:name).values(["a"*256])}
+    end
+
+データベースに保存できないデータを指定して、 `should_not` でマッチさせることを想定している
+
+`values` メソッドで、値を配列で指定する
+
+例)
+
+    describe Model do
+      it{should_not success_persistance_of(:name).values([nil])}      # not null カラム
+      it{should_not success_persistance_of(:name).values(["a", "a"])} # unique カラム
+      it{should_not success_persistance_of(:name).values(["a"*256])}  # varchar(255)
+      it{should_not success_persistance_of(:name).values([10**10])}   # int(9)
+    end
+
+他のカラムはすべて nil で保存される
+
+他のカラムにデフォルトを与える場合は subject 句を定義する
+
+例)
+
+    describe Model do
+      subject{Model.new FactoryGirl.attributes_for(:model)}
+
+      it{should_not success_persistance_of(:name).values([nil])}      # not null カラム
+      it{should_not success_persistance_of(:name).values(["a", "a"])} # unique カラム
+      it{should_not success_persistance_of(:name).values(["a"*256])}  # varchar(255)
+      it{should_not success_persistance_of(:name).values([10**10])}   # int(9)
     end
 
