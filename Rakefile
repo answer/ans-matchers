@@ -1,7 +1,5 @@
-#!/usr/bin/env rake
-
 require "ans-releaser"
-class ReleaseTask
+class GemReleaseTask
   include Ans::Releaser::GemTask
 
   def gem_host
@@ -12,4 +10,4 @@ class ReleaseTask
   end
 end
 
-ReleaseTask.new.build_release_tasks
+GemReleaseTask.new.build_release_tasks

@@ -14,6 +14,4 @@ Gem::Specification.new do |gem|
   gem.name          = "ans-matchers"
   gem.require_paths = ["lib"]
   gem.version       = Ans::Matchers::VERSION
-
-  gem.add_development_dependency "ans-releaser"
 end
