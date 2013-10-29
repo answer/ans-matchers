@@ -33,7 +33,7 @@ success_persistance_of の全カラム版
 primary カラムは除外されるが、その他のカラムを除外することはできない
 
 
-have_executable_scope(:scope).params("arg1","arg2").to_sql(sql)
+have_executable_scope(:scope).params("arg1","arg2").by_sql(sql)
 ---------------------------------------------------------------
 
 「実行可能なスコープが存在すること」
