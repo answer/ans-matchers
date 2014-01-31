@@ -4,12 +4,13 @@ ans-matchers
 rspec のマッチャ拡張
 
 * `have_out_of_range_validation`
-* `success_persistance_of`
+* `have_association_db_index`
 * `have_executable_scope`
+* `success_persistance_of`
 
 
-have_out_of_range_validation(columns)
-----------------------------------
+have_out_of_range_validation(columns=nil)
+-----------------------------------------
 
 「sql レベルで out of range を起こす値をバリデーションエラーにすること」
 
@@ -31,6 +32,27 @@ have_out_of_range_validation(columns)
 success_persistance_of の全カラム版
 
 primary カラムは除外されるが、その他のカラムを除外することはできない
+
+
+have_association_db_index(except: columns)
+------------------------------------------
+
+「association のアクセスで使用されるカラムの index を持つこと」
+
+    describe Model do
+      it{should have_association_db_index}
+    end
+
+全カラムはモデルの columns メソッドを使用して取得する  
+`*_id` という名前のカラムに対して index がはられているか確認する
+
+除外したいカラムは except: で指定する
+
+例)
+
+    describe Model do
+      it{should have_association_db_index(except: [:login_id])}
+    end
 
 
 have_executable_scope(:scope).params("arg1","arg2").by_sql(sql)
