@@ -13,10 +13,10 @@ module Ans
       def matches?(subject)
         @error_columns = []
 
-        indexes = ActiveRecord::Base.connection.indexes(subject.class.table_name)
+        indexes = subject.class.connection.indexes(subject.class.table_name)
         subject.class.columns.each do |column|
-          column_name = column.name.to_sym
-          if column_name.to_s.end_with?("_id") && !@except_columns[column_name]
+          column_name = column.name.to_s
+          if column_name.end_with?("_id") && !@except_columns[column_name.to_sym]
             unless indexes.any?{|index| index.columns == [column_name]}
               @error_columns << column_name
             end
