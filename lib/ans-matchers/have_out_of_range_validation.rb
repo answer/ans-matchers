@@ -1,12 +1,14 @@
 module Ans
   module Matchers
-    def have_out_of_range_validation(columns=nil)
-      HaveOutOfRangeValidation.new columns
+    def have_out_of_range_validation(opts=nil)
+      HaveOutOfRangeValidation.new opts
     end
 
     class HaveOutOfRangeValidation
-      def initialize(columns)
-        @columns = columns || {}
+      def initialize(opts)
+        opts ||= {}
+        @columns = opts[:columns] || {}
+        @except_columns = Hash[(opts[:except] || []).map{|column| [column,true]}]
       end
 
       def matches?(subject)
@@ -15,14 +17,16 @@ module Ans
 
         subject.class.columns.each do |column|
           column_name = column.name.to_sym
-          if over = over_value(column)
-            sub = subject.dup
-            sub[column_name] = over
-            begin
-              sub.save
-            rescue => e
-              @error_columns.push column_name
-              @exceptions.push e
+          unless @except_columns[column_name]
+            if over = over_value(column)
+              sub = subject.dup
+              sub[column_name] = over
+              begin
+                sub.save
+              rescue => e
+                @error_columns.push column_name
+                @exceptions.push e
+              end
             end
           end
         end
