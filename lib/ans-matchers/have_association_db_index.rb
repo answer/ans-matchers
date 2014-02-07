@@ -7,7 +7,7 @@ module Ans
     class HaveAssociationDbIndex
       def initialize(opts)
         opts ||= {}
-        @except_columns = Hash[(opts[:columns] || []).map{|column| [column,true]}]
+        @except_columns = Hash[(opts[:except] || []).map{|column| [column,true]}]
       end
 
       def matches?(subject)
