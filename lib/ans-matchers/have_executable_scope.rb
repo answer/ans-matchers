@@ -18,7 +18,7 @@ RSpec::Matchers.define :have_executable_scope do |scope_name|
       expect_sql = expect_sql.gsub(/\s+/, " ").strip
     end
 
-    scope_sql.should == expect_sql
+    expect(scope_sql).to be expect_sql
     scoped.each{break}
 
     true
