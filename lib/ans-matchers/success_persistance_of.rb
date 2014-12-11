@@ -1,49 +1,30 @@
-module Ans
-  module Matchers
-    def success_persistance_of(attr)
-      SuccessPersistanceOf.new attr
-    end
+RSpec::Matchers.define :success_persistance_of do |attr|
+  attribute = attribute.to_s
 
-    class SuccessPersistanceOf
-      attr_reader :failure_message, :negative_failure_message
+  description{"success persistance of #{attribute}"}
 
-      def initialize(attribute)
-        @attribute = attribute.to_s
-        @options = {}
-      end
+  chain(:values){|values| @values = values}
 
-      def values(values)
-        @options[:values] = values
-        self
-      end
-
-      def matches?(subject)
-        @subject = subject
-
-        ensure_values.each do |value|
-          @subject[@attribute] = value
-          unless @subject.save
-            @failure_message = %Q{failed persistance
+  match do |actual|
+    ensure_values.each do |value|
+      actual[attribute] = value
+      unless actual.save
+        @failure_message = %Q{failed persistance
 value: [#{value}]}
-            return false
-          end
-        end
-
-        @negative_failure_message = "success persistance of #{@attribute}"
-        true
+        return false
       end
-
-      def description
-        "success persistance of #{@attribute}"
-      end
-
-      private
-
-      def ensure_values
-        v = @options[:values]
-        v.present? ? v : [nil]
-      end
-
     end
+    true
+  end
+  failure_message do |actual|
+    @failure_message
+  end
+  failure_message_when_negated do |actual|
+    "have named_scope #{attribute}"
+  end
+
+  def ensure_values
+    v = @values
+    v.present? ? v : [nil]
   end
 end
