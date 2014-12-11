@@ -18,12 +18,28 @@ RSpec::Matchers.define :have_executable_scope do |scope_name|
       expect_sql = expect_sql.gsub(/\s+/, " ").strip
     end
 
-    expect(scope_sql).to be expect_sql
     scoped.each{break}
-
-    true
+    scope_sql == expect_sql
   end
   failure_message_when_negated do |actual|
+    scope_sql = scoped.to_sql
+    expect_sql = @sql
     "have named_scope #{scope_name}"
+  end
+  failure_message do |actual|
+    scoped = actual.send scope_name, *(@args || [])
+    scope_sql = scoped.to_sql
+    expect_sql = @sql
+
+    unless @is_strict
+      scope_sql = scope_sql.gsub(/\s+/, " ").strip
+      expect_sql = expect_sql.gsub(/\s+/, " ").strip
+    end
+
+    "have named_scope #{scope_name}
+expected:
+  #{expect_sql}
+got:
+  #{scope_sql}"
   end
 end
