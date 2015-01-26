@@ -14,53 +14,68 @@ have_out_of_range_validation(except: columns, columns: columns)
 
 「sql レベルで out of range を起こす値をバリデーションエラーにすること」
 
-    describe Model do
-      it{should have_out_of_range_validation}
-    end
+```ruby
+describe Model do
+  it{expect(subject).to have_out_of_range_validation}
+  it{expect(subject).to have_out_of_range_validation.except(:my_column,:my_column2)}
+  it{expect(subject).to have_out_of_range_validation.force(:my_column,:my_column2)}
+  it{expect(subject).to have_out_of_range_validation.as(
+    my_column: 10**10
+  )}
+end
+```
 
 全カラムはモデルの columns メソッドを使用して取得する  
 保存できる最大長は column オブジェクトから取得する
 
-自動で取得した最大長を上書きしたい場合は columns を指定する  
-除外したいカラムは except で指定する
+* except で除外するカラムを列挙できる
+* force で除外するカラムに該当する場合でもチェックできる
+* as で例外を引き起こすべき値をカラムごとに指定できる
 
-例)
+### 指定可能な設定とデフォルト
 
-    describe Model do
-      it{should have_out_of_range_validation(
-        columns: {
-          name: "a"*256,
-        },
-        except: %i{image},
-      )}
-    end
+```ruby
+Ans::Matchers.configure do |config|
+  config.have_out_of_range_validation.except_columns = [
+    :id,
+    %r{_id$},
+    %r{_type$},
+    %r{_status$},
+    %r{_fla?g$},
+  ]
+end
+```
 
-success_persistance_of の全カラム版
-
-primary カラムは自動で除外される  
-carrierwave の image カラム等、 validation を定義すると動かないカラムは except で除外可能
-
+* except_columns にデフォルトで無視するカラムを列挙する
 
 have_association_db_index(except: columns)
 ------------------------------------------
 
 「association のアクセスで使用されるカラムの index を持つこと」
 
-    describe Model do
-      it{should have_association_db_index}
-    end
+```ruby
+describe Model do
+  it{expect(subject).to have_association_db_index}
+  it{expect(subject).to have_association_db_index.except(:my_column,:my_column2)}
+end
+```
 
 全カラムはモデルの columns メソッドを使用して取得する  
 `*_id` という名前のカラムに対して index がはられているか確認する
 
-除外したいカラムは except: で指定する
+* except で除外するカラムを列挙できる
 
-例)
+### 指定可能な設定とデフォルト
 
-    describe Model do
-      it{should have_association_db_index(except: [:login_id])}
-    end
+```ruby
+Ans::Matchers.configure do |config|
+  config.have_association_db_index.validate_columns = [
+    %r{_id$},
+  ]
+end
+```
 
+* validate_columns にチェックするカラムを列挙する
 
 have_executable_scope(:scope).params("arg1","arg2").by_sql(sql)
 ---------------------------------------------------------------
@@ -119,6 +134,8 @@ sql は空白をまとめて比較される
 
 success_persistance_of(:attribute)
 ----------------------------------
+
+**これは削除予定ですので使用しないように**
 
 「保存に成功すること」
 

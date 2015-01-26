@@ -1,5 +1,5 @@
 module Ans
   module Matchers
-    VERSION = "2.0.3"
+    VERSION = "3.0.0"
   end
 end
