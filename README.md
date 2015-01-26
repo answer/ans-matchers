@@ -9,8 +9,8 @@ rspec のマッチャ拡張
 * `success_persistance_of`
 
 
-have_out_of_range_validation(except: columns, columns: columns)
----------------------------------------------------------------
+have_out_of_range_validation
+----------------------------
 
 「sql レベルで out of range を起こす値をバリデーションエラーにすること」
 
@@ -48,8 +48,8 @@ end
 
 * except_columns にデフォルトで無視するカラムを列挙する
 
-have_association_db_index(except: columns)
-------------------------------------------
+have_association_db_index
+-------------------------
 
 「association のアクセスで使用されるカラムの index を持つこと」
 
