@@ -38,14 +38,14 @@ RSpec::Matchers.define :have_out_of_range_validation do
     @error_columns = []
     @exceptions = []
 
-    actual.class.columns.each do |column|
+    actual.columns.each do |column|
       column_name = column.name.to_sym
       if check_column?(column_name)
         if over = over_value(column)
-          sub = actual.dup
-          sub[column_name] = over
+          instance = actual.new
+          instance[column_name] = over
           begin
-            sub.save
+            instance.save
           rescue => e
             @error_columns.push column_name
             @exceptions.push e

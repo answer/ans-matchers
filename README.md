@@ -5,8 +5,7 @@ rspec のマッチャ拡張
 
 * `have_out_of_range_validation`
 * `have_association_db_index`
-* `have_executable_scope`
-* `success_persistance_of`
+* `have_executable_sql`
 
 
 have_out_of_range_validation
@@ -16,10 +15,10 @@ have_out_of_range_validation
 
 ```ruby
 describe Model do
-  it{expect(subject).to have_out_of_range_validation}
-  it{expect(subject).to have_out_of_range_validation.except(:my_column,:my_column2)}
-  it{expect(subject).to have_out_of_range_validation.force(:my_column,:my_column2)}
-  it{expect(subject).to have_out_of_range_validation.as(
+  it{expect(Model).to have_out_of_range_validation}
+  it{expect(Model).to have_out_of_range_validation.except(:my_column,:my_column2)}
+  it{expect(Model).to have_out_of_range_validation.force(:my_column,:my_column2)}
+  it{expect(Model).to have_out_of_range_validation.as(
     my_column: 10**10
   )}
 end
@@ -48,6 +47,7 @@ end
 
 * except_columns にデフォルトで無視するカラムを列挙する
 
+
 have_association_db_index
 -------------------------
 
@@ -55,8 +55,8 @@ have_association_db_index
 
 ```ruby
 describe Model do
-  it{expect(subject).to have_association_db_index}
-  it{expect(subject).to have_association_db_index.except(:my_column,:my_column2)}
+  it{expect(Model).to have_association_db_index}
+  it{expect(Model).to have_association_db_index.except(:my_column,:my_column2)}
 end
 ```
 
@@ -77,8 +77,31 @@ end
 
 * validate_columns にチェックするカラムを列挙する
 
+
+have_executable_sql
+-------------------
+
+「スコープは実行可能な sql を生成すること」
+
+```ruby
+describe Model do
+  it{expect(Model.my_scope("arg1","arg2")).to have_executable_sql <<-SQL}
+    SELECT `table`.* from `table`
+    WHERE `table`.`id` in ("arg1", "arg2")
+  SQL
+end
+```
+
+* 指定されたスコープの `to_sql` が一致すること
+* そのスコープを `each` した時にエラーにならないこと
+
+空白の違いは無視して比較される
+
+
 have_executable_scope(:scope).params("arg1","arg2").by_sql(sql)
 ---------------------------------------------------------------
+
+**これは削除予定ですので使用しないように**
 
 「実行可能なスコープが存在すること」
 

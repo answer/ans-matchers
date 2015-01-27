@@ -23,8 +23,8 @@ RSpec::Matchers.define :have_association_db_index do
   match do |actual|
     @error_columns = []
 
-    indexes = actual.class.connection.indexes(actual.class.table_name)
-    actual.class.columns.each do |column|
+    indexes = actual.connection.indexes(actual.table_name)
+    actual.columns.each do |column|
       column_name = column.name.to_s
       if check_column?(column_name.to_sym)
         unless indexes.any?{|index| index.columns == [column_name]}
