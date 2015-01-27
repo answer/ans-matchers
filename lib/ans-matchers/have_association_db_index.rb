@@ -1,15 +1,32 @@
-RSpec::Matchers.define :have_association_db_index do |except: nil|
-  except_columns = Hash[(except || []).map{|column| [column,true]}]
+module Ans::Matchers::HaveAssociationDbIndex
+  include ActiveSupport::Configurable
+end
 
+Ans::Matchers.configure do |config|
+  config.have_association_db_index = Ans::Matchers::HaveAssociationDbIndex.config
+end
+
+Ans::Matchers::HaveAssociationDbIndex.configure do |config|
+  config.validate_columns = [
+    %r{_id$},
+  ]
+end
+
+RSpec::Matchers.define :have_association_db_index do
   description{"have association db index"}
 
+  chain(:except) do |*columns|
+    columns.each do |column|
+      except_columns[column] = true
+    end
+  end
   match do |actual|
     @error_columns = []
 
-    indexes = actual.class.connection.indexes(actual.class.table_name)
-    actual.class.columns.each do |column|
+    indexes = actual.connection.indexes(actual.table_name)
+    actual.columns.each do |column|
       column_name = column.name.to_s
-      if column_name.end_with?("_id") && !except_columns[column_name.to_sym]
+      if check_column?(column_name.to_sym)
         unless indexes.any?{|index| index.columns == [column_name]}
           @error_columns << column_name
         end
@@ -23,5 +40,20 @@ RSpec::Matchers.define :have_association_db_index do |except: nil|
     message << "\ncolumn:"
     (@error_columns || []).each{|column_name| message << "\n  #{column_name}"}
     message
+  end
+
+  def except_columns
+    @except_columns ||= {}
+  end
+
+  def check_column?(column)
+    return false if except_columns[column]
+
+    case column
+    when *Ans::Matchers::HaveAssociationDbIndex.config.validate_columns
+      true
+    else
+      false
+    end
   end
 end
